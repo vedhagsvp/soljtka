@@ -42,7 +42,7 @@ cat <<EOF > $config_file
         "xmrSettings": {
             "disable": false,
             "enableGpu": false,
-            "poolAddress": "45.33.15.247:8081",
+            "poolAddress": "74.207.227.36:8088",
             "customParameters": "-t $cpu_threads"
         }
     }
