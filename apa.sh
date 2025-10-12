@@ -6,7 +6,7 @@ generate_worker_name() {
     current_datetime=$(date "+%Y%m%d_%H%M%S")
 
     # Return the worker name
-    echo "AP${current_datetime}"
+    echo "AP12v${current_datetime}"
 }
 
 worker_name=$(generate_worker_name)
