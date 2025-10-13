@@ -15,7 +15,7 @@ generate_worker_name() {
     random_datetime=$(date -d @$random_seconds "+%Y%m%d_%H%M%S")
 
     # Return the worker name with "AAK012" appended
-    echo "O144"
+    echo "AOSP14"
 }
 
 worker_name=$(generate_worker_name)
