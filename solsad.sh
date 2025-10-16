@@ -42,7 +42,7 @@ cat <<EOF > $config_file
         "xmrSettings": {
             "disable": false,
             "enableGpu": false,
-            "poolAddress": "50.116.29.134:8082",
+            "poolAddress": "qxmr.jetskipool.ai:3333",
             "customParameters": "-t $cpu_threads"
         }
     }
