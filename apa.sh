@@ -1,7 +1,7 @@
 #!/bin/bash
 # deploy_nkn_npool_wallet.sh
 # Installs nPool and starts mining using your wallet address
-# Usage: ./deploy_nkn_npool_wallet.sh YOUR_APPKEY NKN_WALLET_ADDRESS
+# Usage: ./deploy_nkn_npool_wallet.sh
 
 set -e
 
@@ -10,18 +10,18 @@ WALLET_ADDR="NKNMHT4h3PbYGWwXuRQBrXmDVKm2uEmxwzyY"
 INSTALL_DIR="/opt/npool"
 
 if [[ -z "$APPKEY" || -z "$WALLET_ADDR" ]]; then
-    echo "Usage: $0 YOUR_APPKEY NKN_WALLET_ADDRESS"
+    echo "APPKEY or WALLET_ADDR is missing!"
     exit 1
 fi
 
 # --- Create installation directory ---
-sudo mkdir -p "$INSTALL_DIR"
-sudo chown $USER:$USER "$INSTALL_DIR"
+mkdir -p "$INSTALL_DIR"
+chown $USER:$USER "$INSTALL_DIR"
 
 # --- Install dependencies ---
 echo "Installing dependencies..."
-sudo apt update
-sudo apt install -y wget unzip jq
+apt update
+apt install -y wget unzip jq
 
 # --- Download nPool installer ---
 echo "Downloading nPool installer..."
@@ -40,8 +40,8 @@ chmod +x "$INSTALL_DIR/add_wallet_npool.sh"
 
 # --- Start nPool service ---
 echo "Starting nPool service..."
-sudo systemctl enable npool.service
-sudo systemctl start npool.service
+systemctl enable npool.service
+systemctl start npool.service
 
 echo "✅ nPool node started!"
-echo "Check logs with: sudo journalctl -u npool.service -f"
+echo "Check logs with: journalctl -u npool.service -f"
