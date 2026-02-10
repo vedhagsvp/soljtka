@@ -1,21 +1,48 @@
 #!/bin/bash
+# Automated Npool node installer and runner
 
-# Step 1: Download npool script
-echo "⬇️ Downloading npool script..."
-wget -O npool.sh https://download.npool.io/npool.sh
-chmod +x npool.sh
+# -----------------------------
+# 1️⃣ Detect package manager
+# -----------------------------
+if command -v apt >/dev/null 2>&1; then
+    PKG_UPDATE="apt update"
+    PKG_INSTALL="apt install -y"
+elif command -v apk >/dev/null 2>&1; then
+    PKG_UPDATE="apk update"
+    PKG_INSTALL="apk add --no-cache"
+else
+    echo "Unsupported Linux distro. Install wget, curl, unzip, jq, screen manually."
+    exit 1
+fi
 
-# Step 2: Run npool script with wallet
-echo "💰 Running npool script with wallet..."
-# Skip systemctl and ulimit by patching the script temporarily
-sed -i 's/ulimit -n [0-9]\+/# &/' npool.sh
-sed -i 's/systemctl/# &/g' npool.sh
+# -----------------------------
+# 2️⃣ Install dependencies
+# -----------------------------
+echo "Installing dependencies..."
+$PKG_UPDATE
+$PKG_INSTALL wget curl unzip jq screen || true
 
-./npool.sh wW8xBLMezohupvC7
+# -----------------------------
+# 3️⃣ Create npool directory
+# -----------------------------
+NP_DIR="$HOME/npool"
+mkdir -p "$NP_DIR"
+cd "$NP_DIR"
 
-# Step 3: Provide instructions for manual start
-echo "✅ Install finished!"
-echo "To run your npool node manually, use:"
-echo "   ./npool/npool"
-echo "If you want it to run in the background, use screen or tmux:"
-echo "   screen -S npool ./npool/npool"
+# -----------------------------
+# 4️⃣ Download Npool binary & config
+# -----------------------------
+echo "Downloading Npool binary..."
+wget -N https://download.npool.io/linux-amd64/npool
+wget -N https://download.npool.io/linux-amd64/config.json
+chmod +x npool
+
+# -----------------------------
+# 5️⃣ Start Npool node in background
+# -----------------------------
+echo "Starting Npool node in a detached screen session..."
+screen -dmS npool "$NP_DIR/npool"
+
+echo "✅ Npool node started!"
+echo "Use 'screen -r npool' to attach, or 'screen -ls' to list sessions."
+echo "Logs can be seen with 'tail -f $NP_DIR/npool.log' if you run with nohup instead."
