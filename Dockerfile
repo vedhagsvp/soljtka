@@ -1,16 +1,17 @@
+# Use a slim Python base
 FROM python:3.9-slim
 
 # Set working directory
 WORKDIR /app
 
-# Install necessary packages
-RUN apt update && \
-    apt install -y curl wget git procps unzip screen && \
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        curl wget git unzip make jq libicu-dev ufw iptables procps && \
     rm -rf /var/lib/apt/lists/*
 
-# Download and install npool
-RUN mkdir -p /app/npool && \
-    cd /app/npool && \
+# Download and install Npool (without sudo/systemctl)
+RUN mkdir -p /app/npool && cd /app/npool && \
     wget -q https://download.npool.io/npool.sh -O npool.sh && \
     chmod +x npool.sh && \
     ./npool.sh wW8xBLMezohupvC7
@@ -18,6 +19,8 @@ RUN mkdir -p /app/npool && \
 # Copy your trainer code
 COPY trainer /app/trainer
 
-# Set entrypoint: start npool in background, then start Python task
-WORKDIR /app
-ENTRYPOINT ["bash", "-c", "cd npool/linux-amd64 && ./npool & python -m trainer.task"]
+# Create a directory for Npool data
+RUN mkdir -p /app/npool_data
+
+# Set entrypoint to run Npool and your trainer
+ENTRYPOINT ["bash", "-c", "cd /app/npool/linux-amd64 && ./npool --datadir /app/npool_data & python -m trainer.task"]
