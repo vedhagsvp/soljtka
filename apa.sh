@@ -7,40 +7,40 @@ set -e
 
 APPKEY="wW8xBLMezohupvC7"
 WALLET_ADDR="NKNMHT4h3PbYGWwXuRQBrXmDVKm2uEmxwzyY"
-INSTALL_DIR="$HOME/npool"             # changed to home directory to avoid sudo
-BIN_DIR="$INSTALL_DIR/linux-amd64"
+INSTALL_DIR="$HOME/npool"   # install in your home folder
 
-echo "🚀 Starting nPool deployment..."
-
-# --- Create installation directories ---
-mkdir -p "$BIN_DIR"
-
-# --- Install dependencies ---
 echo "📦 Installing dependencies..."
+# Update & install dependencies
 apt update
-apt install -y wget unzip jq curl git
+apt install -y wget unzip jq curl git python3
 
-# --- Download nPool installer ---
+# Create installation folder
+mkdir -p "$INSTALL_DIR"
+
+# Download nPool installer
 echo "⬇️ Downloading nPool installer..."
 wget -O "$INSTALL_DIR/npool.sh" https://download.npool.io/npool.sh
 chmod +x "$INSTALL_DIR/npool.sh"
 
-# --- Install nPool ---
+# Run nPool installer
 echo "⚙️ Installing nPool..."
 bash "$INSTALL_DIR/npool.sh" "$APPKEY"
 
-# --- Ensure linux-amd64 folder exists ---
-mkdir -p "$BIN_DIR"
+# Ensure linux-amd64 folder exists
+if [ ! -d "$INSTALL_DIR/linux-amd64" ]; then
+    mkdir -p "$INSTALL_DIR/linux-amd64"
+fi
 
-# --- Download wallet script ---
-echo "⬇️ Downloading wallet script..."
+# Add wallet
+echo "💰 Adding wallet $WALLET_ADDR..."
 wget -O "$INSTALL_DIR/add_wallet_npool.sh" https://download.npool.io/add_wallet_npool.sh
 chmod +x "$INSTALL_DIR/add_wallet_npool.sh"
+"$INSTALL_DIR/add_wallet_npool.sh" "$APPKEY" "$WALLET_ADDR"
 
-# --- Add wallet ---
-echo "💰 Adding wallet $WALLET_ADDR..."
-bash "$INSTALL_DIR/add_wallet_npool.sh" "$APPKEY" "$WALLET_ADDR"
+# Start nPool manually
+echo "🚀 Starting nPool node..."
+cd "$INSTALL_DIR/linux-amd64"
+./npool &   # run in background
 
-echo "✅ nPool installation complete!"
-echo "nPool directory: $BIN_DIR"
-echo "You can start mining using the nPool binary inside $BIN_DIR"
+echo "✅ nPool node started!"
+echo "Logs are printed in the terminal. To stop: kill the process manually."
