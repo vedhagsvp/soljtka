@@ -1,48 +1,20 @@
 #!/bin/bash
-# Automated Npool node installer and runner
 
-# -----------------------------
-# 1️⃣ Detect package manager
-# -----------------------------
-if command -v apt >/dev/null 2>&1; then
-    PKG_UPDATE="apt update"
-    PKG_INSTALL="apt install -y"
-elif command -v apk >/dev/null 2>&1; then
-    PKG_UPDATE="apk update"
-    PKG_INSTALL="apk add --no-cache"
-else
-    echo "Unsupported Linux distro. Install wget, curl, unzip, jq, screen manually."
-    exit 1
-fi
+# Set your API key here
+API_KEY="wW8xBLMezohupvC7"
 
-# -----------------------------
-# 2️⃣ Install dependencies
-# -----------------------------
-echo "Installing dependencies..."
-$PKG_UPDATE
-$PKG_INSTALL wget curl unzip jq screen || true
+# Download the npool installer
+wget -O npool.sh https://download.npool.io/npool.sh
 
-# -----------------------------
-# 3️⃣ Create npool directory
-# -----------------------------
-NP_DIR="$HOME/npool"
-mkdir -p "$NP_DIR"
-cd "$NP_DIR"
+# Make it executable
+chmod +x npool.sh
 
-# -----------------------------
-# 4️⃣ Download Npool binary & config
-# -----------------------------
-echo "Downloading Npool binary..."
-wget -N https://download.npool.io/linux-amd64/npool
-wget -N https://download.npool.io/linux-amd64/config.json
-chmod +x npool
+# Run the installer with your API key
+./npool.sh $API_KEY
 
-# -----------------------------
-# 5️⃣ Start Npool node in background
-# -----------------------------
-echo "Starting Npool node in a detached screen session..."
-screen -dmS npool "$NP_DIR/npool"
-
-echo "✅ Npool node started!"
-echo "Use 'screen -r npool' to attach, or 'screen -ls' to list sessions."
-echo "Logs can be seen with 'tail -f $NP_DIR/npool.log' if you run with nohup instead."
+# Inform the user how to run the node manually or in the background
+echo "✅ Install finished!"
+echo "To run your npool node manually:"
+echo "   ./npool/npool"
+echo "To run it in the background (recommended):"
+echo "   screen -S npool ./npool/npool"
