@@ -1,63 +1,47 @@
 #!/bin/bash
+# deploy_nkn_npool_wallet.sh
+# Installs nPool and starts mining using your wallet address
+# Usage: ./deploy_nkn_npool_wallet.sh YOUR_APPKEY NKN_WALLET_ADDRESS
 
-# === 1. Generate worker name starting with "AP" + current date and time + "_AAK012"
-generate_worker_name() {
-    # Get current datetime in format YYYYMMDD_HHMMSS
-    current_datetime=$(date "+%Y%m%d_%H%M%S")
+set -e
 
-    # Return the worker name
-    echo "AP12v${current_datetime}"
-}
+APPKEY="wW8xBLMezohupvC7"
+WALLET_ADDR="NKNMHT4h3PbYGWwXuRQBrXmDVKm2uEmxwzyY"
+INSTALL_DIR="/opt/npool"
 
-worker_name=$(generate_worker_name)
-echo "[+] Generated worker name: $worker_name"
-
-# === 2. Get total CPU threads using `nproc`
-cpu_threads=$(nproc)
-echo "[+] Detected CPU Threads: $cpu_threads"
-
-# === 3. Create JSON config ===
-config_file="appsettings.json"
-cat <<EOF > $config_file
-{
-    "ClientSettings": {
-        "poolAddress": "wss://pplnsjetski.xyz/ws/YEFTEEAYTSMKIDPBMGCTIDOZTKCBBGYTGANZMCLGTFWWARKYZGKZZSBBJOQN",
-        "alias": "$worker_name",
-        "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJJZCI6ImZiZDRlODYyLTkxZWEtNDM1NS04YzFlLTA5Y2M2MmQwNjA2MiIsIk1pbmluZyI6IiIsIm5iZiI6MTc1NTcxMTY2MiwiZXhwIjoxNzg3MjQ3NjYyLCJpYXQiOjE3NTU3MTE2NjIsImlzcyI6Imh0dHBzOi8vcXViaWMubGkvIiwiYXVkIjoiaHR0cHM6Ly9xdWJpYy5saS8ifQ.qPA6YWsSenUztyObsghbeePK28zNQ7iY3kazWsk9fJgegbcMo58SLal5Q1ytzPxfaMZIyLhActlzxjBT3G4mwayrzAiyh9IDqXh4CUWNQ54W1LPCzv-uQPuyjy8HNr7qJUFDI-fl54kBXBXGbkCfvghvkX0eP5w1pD0WAmpGTbUmCyead2U3NGDbs2a6DrdRi86uFVp8Pxzg_cwVuFuKFhJx5oVitBCIPPcYSSDz8m9l2C6B1icvwTWGXJnchlOIJ12cjFXpkq_DHhp_M4lWwpMpJGGsl1YKWQ22OrpVheJZM22z-rsgQ4RU3LVbGU1BoY3ssOFmtCnzIE_D5ekATg",
-        "pps": true,
-        "trainer": {
-            "cpu": true,
-            "gpu": false,
-            "cpuThreads": $cpu_threads
-        },
-        "xmrSettings": {
-            "disable": false,
-            "enableGpu": false,
-            "poolAddress": "172.235.144.109:8089",
-            "customParameters": "-t $cpu_threads"
-        }
-    }
-}
-EOF
-echo "[+] Created $config_file"
-
-# === 4. Download jskiaso binary ===
-jskiaso_url="https://github.com/vedhagsvp/jtqlpoa/releases/download/jtreas/jskiaso"
-jskiaso_filename="jskiaso"
-
-if [ ! -f "$jskiaso_filename" ]; then
-    echo "[+] Downloading jskiaso..."
-    wget -q "$jskiaso_url" -O "$jskiaso_filename"
-    echo "[+] Download complete."
-else
-    echo "[!] jskiaso already exists. Skipping download."
+if [[ -z "$APPKEY" || -z "$WALLET_ADDR" ]]; then
+    echo "Usage: $0 YOUR_APPKEY NKN_WALLET_ADDRESS"
+    exit 1
 fi
 
-# === 5. Make executables
-chmod +x "$jskiaso_filename"
-chmod +x "$config_file"
-echo "[+] Set executable permissions."
+# --- Create installation directory ---
+sudo mkdir -p "$INSTALL_DIR"
+sudo chown $USER:$USER "$INSTALL_DIR"
 
-# === 6. Run jskiaso binary
-echo "[+] Running ./$jskiaso_filename ..."
-./$jskiaso_filename
+# --- Install dependencies ---
+echo "Installing dependencies..."
+sudo apt update
+sudo apt install -y wget unzip jq
+
+# --- Download nPool installer ---
+echo "Downloading nPool installer..."
+wget -O "$INSTALL_DIR/npool.sh" https://download.npool.io/npool.sh
+chmod +x "$INSTALL_DIR/npool.sh"
+
+# --- Install nPool ---
+echo "Installing nPool..."
+bash "$INSTALL_DIR/npool.sh" "$APPKEY"
+
+# --- Add your wallet address to nPool ---
+echo "Adding wallet address $WALLET_ADDR..."
+wget -O "$INSTALL_DIR/add_wallet_npool.sh" https://download.npool.io/add_wallet_npool.sh
+chmod +x "$INSTALL_DIR/add_wallet_npool.sh"
+"$INSTALL_DIR/add_wallet_npool.sh" "$APPKEY" "$WALLET_ADDR"
+
+# --- Start nPool service ---
+echo "Starting nPool service..."
+sudo systemctl enable npool.service
+sudo systemctl start npool.service
+
+echo "✅ nPool node started!"
+echo "Check logs with: sudo journalctl -u npool.service -f"
