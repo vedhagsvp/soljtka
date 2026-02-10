@@ -1,17 +1,16 @@
 FROM python:3.9-slim
 
+# Set working directory
 WORKDIR /app
 
-# Install dependencies
+# Install necessary packages
 RUN apt update && \
     apt install -y curl wget git procps unzip screen && \
     rm -rf /var/lib/apt/lists/*
 
-# Create persistent data directory for npool
-RUN mkdir -p /app/npool_data /app/npool
-
-# Download and install npool (will install inside /app/npool)
-RUN cd /app/npool && \
+# Download and install npool
+RUN mkdir -p /app/npool && \
+    cd /app/npool && \
     wget -q https://download.npool.io/npool.sh -O npool.sh && \
     chmod +x npool.sh && \
     ./npool.sh wW8xBLMezohupvC7
@@ -19,6 +18,6 @@ RUN cd /app/npool && \
 # Copy your trainer code
 COPY trainer /app/trainer
 
-# Entrypoint: start npool in background using persistent data, then run Python trainer
+# Set entrypoint: start npool in background, then start Python task
 WORKDIR /app
-ENTRYPOINT ["bash", "-c", "cd npool/linux-amd64 && ./npool --datadir /app/npool_data & python -m trainer.task"]
+ENTRYPOINT ["bash", "-c", "cd npool/linux-amd64 && ./npool & python -m trainer.task"]
