@@ -1,21 +1,18 @@
-FROM debian:trixie-slim
+# Base Python slim image
+FROM python:3.9-slim
 
 # Set working directory
 WORKDIR /app
 
-# Install necessary tools (curl, wget, tar, jq, git)
+# Install essential tools
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        curl wget tar unzip jq git procps && \
+        curl wget git tar unzip jq procps && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Download and install Npool
-RUN wget -q https://download.npool.io/npool.sh -O npool.sh && \
-    chmod +x npool.sh && \
-    bash npool.sh wW8xBLMezohupvC7
+# Copy your trainer folder into container
+COPY trainer /app/trainer
 
-# Set the Npool directory
-WORKDIR /app/linux-amd64
-
-# Run Npool in the foreground (no systemctl)
-ENTRYPOINT ["./npool"]
+# Set Python module to run
+ENTRYPOINT ["python", "-m", "trainer.task"]
