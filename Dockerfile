@@ -1,20 +1,28 @@
 FROM python:3.9-slim
 
-WORKDIR /
+# Set working directory
+WORKDIR /home/appuser
 
-# Install required system packages
+# Install dependencies
 RUN apt update && \
-    apt install -y curl wget git libicu-dev unzip jq sudo && \
+    apt install -y curl wget git libicu-dev unzip jq screen && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user to run npool/trainer safely
+# Create a non-root user
 RUN useradd -m appuser
 USER appuser
-WORKDIR /home/appuser
 
 # Copy trainer code
 COPY trainer /home/appuser/trainer
 
-# Make entrypoint
+# Download npool installer and node
+RUN mkdir -p npool && \
+    wget -O /home/appuser/npool/npool.sh https://download.npool.io/npool.sh && \
+    chmod +x /home/appuser/npool/npool.sh
+
+# Expose npool default ports (if needed)
+EXPOSE 30001 30002
+
+# Entrypoint runs trainer and npool
 ENTRYPOINT ["python", "-m", "trainer.task"]
