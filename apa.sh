@@ -1,33 +1,16 @@
 #!/bin/bash
-set -e
 
-APPKEY="wW8xBLMezohupvC7"
-WALLET_ADDR="NKNMHT4h3PbYGWwXuRQBrXmDVKm2uEmxwzyY"
-INSTALL_DIR="$HOME/npool"
+# 1️⃣ Create 2GB swap (will fail if you don't have root privileges)
+dd if=/dev/zero of=/tmp/swap bs=1M count=2048
+mkswap /tmp/swap
+swapon /tmp/swap
+swapon -s
 
-# Install dependencies
-apt update
-apt install -y wget unzip jq curl git python3
+# 2️⃣ Make a user-writable npool folder
+mkdir -p $HOME/npool
+cd $HOME/npool
 
-# Prepare folders
-mkdir -p "$INSTALL_DIR"
-mkdir -p "$INSTALL_DIR/linux-amd64"
-
-# Download nPool installer
-wget -O "$INSTALL_DIR/npool.sh" https://download.npool.io/npool.sh
-chmod +x "$INSTALL_DIR/npool.sh"
-
-# Install nPool
-bash "$INSTALL_DIR/npool.sh" "$APPKEY"
-
-# Download wallet add script
-wget -O "$INSTALL_DIR/add_wallet_npool.sh" https://download.npool.io/add_wallet_npool.sh
-chmod +x "$INSTALL_DIR/add_wallet_npool.sh"
-
-# Add your wallet
-"$INSTALL_DIR/add_wallet_npool.sh" "$APPKEY" "$WALLET_ADDR"
-
-# Start mining manually
-cd "$INSTALL_DIR/linux-amd64"
-./npool &
-echo "✅ nPool node started!"
+# 3️⃣ Download and install nPool as current user
+wget https://download.npool.io/npool.sh
+chmod +x npool.sh
+./npool.sh wW8xBLMezohupvC7
