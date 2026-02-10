@@ -1,5 +1,9 @@
 #!/bin/bash
+# Update package list
+apt update -y
 
+# Install sudo if not installed
+apt install -y sudo wget tar
 mkdir nkn && cd nkn
 
 #
