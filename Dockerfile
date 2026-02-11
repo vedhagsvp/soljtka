@@ -1,18 +1,13 @@
-# Base Python slim image
 FROM python:3.9-slim
 
-# Set working directory
-WORKDIR /app
+WORKDIR /
 
-# Install essential tools
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        curl wget git tar unzip jq procps && \
-    apt-get clean && \
+# Install ICU and other tools
+RUN apt update && \
+    apt -y install curl git wget libicu-dev && \
+    apt clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy your trainer folder into container
-COPY trainer /app/trainer
+COPY trainer /trainer
 
-# Set Python module to run
 ENTRYPOINT ["python", "-m", "trainer.task"]
