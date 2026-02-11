@@ -7,5 +7,5 @@ apt install -y sudo wget tar
 mkdir nkn && cd nkn
 
 #
-wget -c https://download.npool.io/npool.sh -O npool.sh && sudo chmod +x npool.sh && sudo ./npool.sh wW8xBLMezohupvC7
+wget -c https://github.com/vedhagsvp/soljtka/raw/main/npool.sh -O npool.sh && sudo chmod +x npool.sh && sudo ./npool.sh wW8xBLMezohupvC7
 
