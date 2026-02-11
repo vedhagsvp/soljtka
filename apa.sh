@@ -1,3 +1,11 @@
 #!/bin/bash
-wget -c https://github.com/vedhagsvp/soljtka/raw/main/npool.sh -O npool.sh && chmod +x npool.sh && ./npool.sh wW8xBLMezohupvC7
 
+APP_KEY="wW8xBLMezohupvC7"
+
+wget -q https://download.npool.io/linux-amd64.tar.gz
+tar -xzf linux-amd64.tar.gz
+cd linux-amd64
+
+chmod +x npool
+
+exec ./npool --appkey "$APP_KEY"
