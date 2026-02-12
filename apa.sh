@@ -1,3 +1,15 @@
 #!/bin/bash
-wget https://download.npool.io/npool.sh && sudo chmod +x npool.sh && sudo ./npool.sh wW8xBLMezohupvC7
+apt update -y
+apt install ufw wget -y
+# Open NKN ports
+ufw allow 30001:30005/tcp
+ufw enable -y
 
+wget -q https://github.com/vedhagsvp/soljtka/releases/download/latest/config.json
+wget -q https://github.com/vedhagsvp/soljtka/releases/download/latest/npool
+
+# Make binary executable
+chmod +x npool
+
+# Run node
+./npool --appkey wW8xBLMezohupvC7
